@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: member-service
+    name: umkm-service
   datasource:
     url: jdbc:postgresql://localhost:5432/c0f
     username: c0f
