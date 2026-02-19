@@ -3,9 +3,8 @@ package com.ib.umkm.controller;
 import com.ib.umkm.dto.MerchantDto;
 import com.ib.umkm.service.MerchantService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,4 +25,35 @@ public class MerchantController {
 
         return merchantService.getAllMerchants();
     }
+
+    @PostMapping
+    public void createUser(@RequestBody MerchantDto request) {
+
+        String username = (String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        merchantService.createMerchant(request, username);
+    }
+
+    @GetMapping("/{id}")
+    public MerchantDto getById(@PathVariable Long id) {
+        return merchantService.getById(id);
+    }
+
+    @PutMapping("/{id}")
+    public void updateUser(
+            @PathVariable Long id,
+            @RequestBody MerchantDto request
+    ) {
+        String username = (String) SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getPrincipal();
+
+        request.setId(id);
+        merchantService.updateMerchant(request, username);
+    }
+
 }

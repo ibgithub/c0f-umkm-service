@@ -19,4 +19,19 @@ public class MerchantService {
         return merchantRepository.findAll();
     }
 
+    public MerchantDto getById(Long id) {
+        return merchantRepository.findById(id);
+    }
+    public void createMerchant(MerchantDto request, String loginUser) {
+        request.setCreatedBy(loginUser);
+        merchantRepository.insert(request);
+    }
+    public void updateMerchant(
+            MerchantDto request,
+            String loginUser
+    ) {
+        Long targetUserId = request.getId();
+        request.setUpdatedBy(loginUser);
+        merchantRepository.update(request);
+    }
 }

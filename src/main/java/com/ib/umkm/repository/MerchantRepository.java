@@ -9,20 +9,19 @@ import java.util.List;
 
 @Repository
 public class MerchantRepository {
-
     private final JdbcTemplate jdbcTemplate;
+    String sql = "SELECT m.id, m.created_by, m.created_date, m.updated_by, m.updated_date, " +
+            "m.name, m.status, u.username owner_name " +
+            "from umkm.merchant m " +
+            "inner join umkm.user_merchant um on um.merchant_id = m.id " +
+            "inner join auth.users u on um.user_id = u.id "
+            ;
 
     public MerchantRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public List<MerchantDto> findAll() {
-        String sql = "SELECT m.id, m.created_by, m.created_date, m.updated_by, m.updated_date, " +
-                "m.name, m.status, u.username owner_name " +
-                "from umkm.merchant m " +
-                "inner join umkm.user_merchant um on um.merchant_id = m.id " +
-                "inner join auth.users u on um.user_id = u.id "
-        ;
 
         return jdbcTemplate.query(sql, merchantRowMapper());
     }
@@ -42,5 +41,40 @@ public class MerchantRepository {
             m.setUpdatedBy(rs.getString("updated_by"));
             return m;
         };
+    }
+
+    public MerchantDto findById(Long id) {
+        sql += " where id = ? ";
+        MerchantDto merchantDto = jdbcTemplate.queryForObject(
+                sql,
+                merchantRowMapper(),
+                id
+        );
+        return merchantDto;
+    }
+
+    public int insert(MerchantDto merchant) {
+        String sqlInsert = "INSERT INTO umkm.merchant (name, created_by) " +
+                "VALUES (?, ?)";
+        int rec;
+        rec = jdbcTemplate.update(
+                sqlInsert,
+                merchant.getName(),
+                merchant.getCreatedBy()
+        );
+
+        return rec;
+    }
+
+    public int update(MerchantDto merchant) {
+        String sql = "update umkm.merchant " +
+                "set name = ?, updated_by = ?, updated_date = now() " +
+                "where id = ? ";
+        return jdbcTemplate.update(
+                sql,
+                merchant.getName(),
+                merchant.getUpdatedBy(),
+                merchant.getId()
+        );
     }
 }
