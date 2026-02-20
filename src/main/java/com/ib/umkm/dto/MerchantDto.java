@@ -6,6 +6,7 @@ public class MerchantDto {
     private Long id;
     private String name;
     private Integer status;
+    private Long ownerId;
     private String ownerName;
 
     private String createdBy;
@@ -27,6 +28,14 @@ public class MerchantDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public String getOwnerName() {

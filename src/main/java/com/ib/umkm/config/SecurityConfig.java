@@ -28,7 +28,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET,  "/api/merchants").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/merchants/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT,  "/api/merchants/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,  "/api/merchants/**").authenticated()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )

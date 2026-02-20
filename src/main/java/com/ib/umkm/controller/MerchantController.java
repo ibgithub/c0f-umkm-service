@@ -1,6 +1,7 @@
 package com.ib.umkm.controller;
 
 import com.ib.umkm.dto.MerchantDto;
+import com.ib.umkm.security.JwtUser;
 import com.ib.umkm.service.MerchantService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,18 +24,27 @@ public class MerchantController {
         String username = authentication.getName();
         System.out.println("Request by: " + username);
 
-        return merchantService.getAllMerchants();
-    }
-
-    @PostMapping
-    public void createUser(@RequestBody MerchantDto request) {
-
-        String username = (String) SecurityContextHolder
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
-        merchantService.createMerchant(request, username);
+        if (jwtUser.getRole().contains("ADMIN")) {
+            return merchantService.getAllMerchants();
+        }
+
+        return merchantService.getMerchantsByOwnerId(jwtUser.getUserId());
+    }
+
+    @PostMapping
+    public void createMerchant(@RequestBody MerchantDto request) {
+
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        merchantService.createMerchant(request, jwtUser.getUsername());
     }
 
     @GetMapping("/{id}")

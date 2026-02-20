@@ -7,12 +7,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -44,15 +45,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+//        Claims claims = jwtUtil.parseToken(token);
+//
+//        UsernamePasswordAuthenticationToken authentication =
+//                new UsernamePasswordAuthenticationToken(
+//                        claims.getSubject(),
+//                        null,
+//                        Collections.emptyList()
+//                );
+//
+//        SecurityContextHolder.getContext()
+//                .setAuthentication(authentication);
+
         Claims claims = jwtUtil.parseToken(token);
+        String username = claims.getSubject();        // sub
+        String role = claims.get("role", String.class); // ADMIN / USER
+        Long userId = claims.get("userId", Long.class);
+
+        // 🔑 ROLE HARUS pakai prefix ROLE_
+        List<SimpleGrantedAuthority> authorities =
+                List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+        JwtUser jwtUser = new JwtUser(userId, username, role);
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        claims.getSubject(),
+                        jwtUser,
                         null,
-                        Collections.emptyList()
+                        authorities
                 );
 
+        // 🔥 INI KUNCI UTAMA
         SecurityContextHolder.getContext()
                 .setAuthentication(authentication);
 

@@ -1,6 +1,7 @@
 package com.ib.umkm.repository;
 
 import com.ib.umkm.dto.MerchantDto;
+import com.ib.umkm.util.Constants;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import java.util.List;
 public class MerchantRepository {
     private final JdbcTemplate jdbcTemplate;
     String sql = "SELECT m.id, m.created_by, m.created_date, m.updated_by, m.updated_date, " +
-            "m.name, m.status, u.username owner_name " +
+            "m.name, m.status, u.username owner_name, um.user_id owner_id " +
             "from umkm.merchant m " +
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
             "inner join auth.users u on um.user_id = u.id "
@@ -32,6 +33,7 @@ public class MerchantRepository {
             m.setId(rs.getLong("id"));
             m.setName(rs.getString("name"));
             m.setOwnerName(rs.getString("owner_name"));
+            m.setOwnerId(rs.getLong("owner_id"));
 
             m.setCreatedBy(rs.getString("created_by"));
             m.setCreatedDate(rs.getTimestamp("created_date").toLocalDateTime());
@@ -44,35 +46,65 @@ public class MerchantRepository {
     }
 
     public MerchantDto findById(Long id) {
-        sql += " where id = ? ";
+        String sqlFindById = sql + " where m.id = ? ";
         MerchantDto merchantDto = jdbcTemplate.queryForObject(
-                sql,
+                sqlFindById,
                 merchantRowMapper(),
                 id
         );
         return merchantDto;
     }
 
-    public int insert(MerchantDto merchant) {
+    public List<MerchantDto> findByOwnerId(Long userId) {
+        String sqlFindByOwnerId = sql + " where um.user_id = ? ";
+        List<MerchantDto> merchants = jdbcTemplate.query(
+                sqlFindByOwnerId,
+                merchantRowMapper(),
+                userId
+        );
+        return merchants;
+    }
+
+    public void insert(MerchantDto merchant) {
         String sqlInsert = "INSERT INTO umkm.merchant (name, created_by) " +
-                "VALUES (?, ?)";
-        int rec;
-        rec = jdbcTemplate.update(
+                "VALUES (?, ?) RETURNING id";
+
+        Long merchantId = jdbcTemplate.queryForObject(
                 sqlInsert,
+                Long.class,
                 merchant.getName(),
                 merchant.getCreatedBy()
         );
 
-        return rec;
+        String sqlInsertUserMerchant = "INSERT INTO umkm.user_merchant (user_id, merchant_id, business_role, created_by) " +
+                "VALUES (?, ?, ?, ? )";
+
+        jdbcTemplate.update(
+                sqlInsertUserMerchant,
+                merchant.getOwnerId(),
+                merchantId,
+                Constants.OWNER,
+                merchant.getCreatedBy()
+        );
     }
 
-    public int update(MerchantDto merchant) {
+    public void update(MerchantDto merchant) {
         String sql = "update umkm.merchant " +
                 "set name = ?, updated_by = ?, updated_date = now() " +
                 "where id = ? ";
-        return jdbcTemplate.update(
+        jdbcTemplate.update(
                 sql,
                 merchant.getName(),
+                merchant.getUpdatedBy(),
+                merchant.getId()
+        );
+
+        String sqlUpdateUserMerchant = "UPDATE umkm.user_merchant set user_id = ?, updated_by = ?, updated_date = now() " +
+                "WHERE merchant_id = ? ";
+
+        jdbcTemplate.update(
+                sqlUpdateUserMerchant,
+                merchant.getOwnerId(),
                 merchant.getUpdatedBy(),
                 merchant.getId()
         );
