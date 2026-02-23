@@ -15,9 +15,9 @@ public class ProductDto {
     private String OwnerName;
 
     private String createdBy;
-    private LocalDateTime createdDate;
+    private LocalDateTime createdAt;
     private String updatedBy;
-    private LocalDateTime updatedDate;
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -99,14 +99,6 @@ public class ProductDto {
         this.createdBy = createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public String getUpdatedBy() {
         return updatedBy;
     }
@@ -115,12 +107,19 @@ public class ProductDto {
         this.updatedBy = updatedBy;
     }
 
-    public LocalDateTime getUpdatedDate() {
-        return updatedDate;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setUpdatedDate(LocalDateTime updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

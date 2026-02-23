@@ -40,9 +40,9 @@ public class ProductRepository {
             m.setOwnerName(rs.getString("owner_name"));
 
             m.setCreatedBy(rs.getString("created_by"));
-            m.setCreatedDate(rs.getTimestamp("created_at").toLocalDateTime());
+            m.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
             if (rs.getTimestamp("updated_at") != null) {
-                m.setUpdatedDate(rs.getTimestamp("updated_at").toLocalDateTime());
+                m.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
             }
             m.setUpdatedBy(rs.getString("updated_by"));
             return m;

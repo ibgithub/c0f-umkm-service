@@ -53,13 +53,13 @@ public class ProductController {
             @PathVariable Long id,
             @RequestBody ProductDto product
     ) {
-        String username = (String) SecurityContextHolder
-            .getContext()
-            .getAuthentication()
-            .getPrincipal();
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
 
         product.setId(id);
-        productService.updateProduct(product, username);
+        productService.updateProduct(product, jwtUser.getUsername());
     }
 
 }
