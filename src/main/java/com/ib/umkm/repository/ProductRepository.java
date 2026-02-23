@@ -83,7 +83,7 @@ public class ProductRepository {
         String sqlInsert = "INSERT INTO umkm.product (merchant_id, sku, name, cost_price, selling_price, " +
                 "created_by, updated_by) " +
                 "VALUES (?, ?, ?, ?, ?, " +
-                "?) ";
+                "?, ?) ";
 
         jdbcTemplate.update(
             sqlInsert,
