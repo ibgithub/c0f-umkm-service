@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public class MerchantRepository {
     private final JdbcTemplate jdbcTemplate;
-    String sql = "SELECT m.id, m.created_by, m.created_date, m.updated_by, m.updated_date, " +
+    String sql = "SELECT m.id, m.created_by, m.created_at, m.updated_by, m.updated_at, " +
             "m.name, m.status, u.username owner_name, um.user_id owner_id " +
             "from umkm.merchant m " +
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
@@ -36,9 +36,9 @@ public class MerchantRepository {
             m.setOwnerId(rs.getLong("owner_id"));
 
             m.setCreatedBy(rs.getString("created_by"));
-            m.setCreatedDate(rs.getTimestamp("created_date").toLocalDateTime());
-            if (rs.getTimestamp("updated_date") != null) {
-                m.setUpdatedDate(rs.getTimestamp("updated_date").toLocalDateTime());
+            m.setCreatedDate(rs.getTimestamp("created_at").toLocalDateTime());
+            if (rs.getTimestamp("updated_at") != null) {
+                m.setUpdatedDate(rs.getTimestamp("updated_at").toLocalDateTime());
             }
             m.setUpdatedBy(rs.getString("updated_by"));
             return m;
@@ -66,13 +66,14 @@ public class MerchantRepository {
     }
 
     public void insert(MerchantDto merchant) {
-        String sqlInsert = "INSERT INTO umkm.merchant (name, created_by) " +
-                "VALUES (?, ?) RETURNING id";
+        String sqlInsert = "INSERT INTO umkm.merchant (name, created_by, updated_by) " +
+                "VALUES (?, ?, ?) RETURNING id";
 
         Long merchantId = jdbcTemplate.queryForObject(
                 sqlInsert,
                 Long.class,
                 merchant.getName(),
+                merchant.getCreatedBy(),
                 merchant.getCreatedBy()
         );
 
@@ -91,7 +92,7 @@ public class MerchantRepository {
 
     public void update(MerchantDto merchant) {
         String sql = "update umkm.merchant " +
-                "set name = ?, updated_by = ?, updated_date = now() " +
+                "set name = ?, updated_by = ?, updated_at = now() " +
                 "where id = ? ";
         jdbcTemplate.update(
                 sql,
@@ -100,7 +101,7 @@ public class MerchantRepository {
                 merchant.getId()
         );
 
-        String sqlUpdateUserMerchant = "UPDATE umkm.user_merchant set user_id = ?, updated_by = ?, updated_date = now() " +
+        String sqlUpdateUserMerchant = "UPDATE umkm.user_merchant set user_id = ?, updated_by = ?, updated_at = now() " +
                 "WHERE merchant_id = ? ";
 
         jdbcTemplate.update(
