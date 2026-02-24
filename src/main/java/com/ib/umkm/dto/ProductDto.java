@@ -13,6 +13,9 @@ public class ProductDto {
     private String merchantName;
     private Long ownerId;
     private String OwnerName;
+    private Long categoryId;
+    private String categoryName;
+    private Long status;
 
     private String createdBy;
     private LocalDateTime createdAt;
@@ -89,6 +92,30 @@ public class ProductDto {
 
     public void setOwnerName(String ownerName) {
         OwnerName = ownerName;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public Long getStatus() {
+        return status;
+    }
+
+    public void setStatus(Long status) {
+        this.status = status;
     }
 
     public String getCreatedBy() {

@@ -11,11 +11,12 @@ import java.util.List;
 public class ProductRepository {
     private final JdbcTemplate jdbcTemplate;
     String sql = "select p.id, p.merchant_id, p.sku, p.name, p.cost_price, " +
-            "p.selling_price, p.status, u.username owner_name, m.name merchant_name, " +
-            "p.created_by, p.created_at, p.updated_by, p.updated_at " +
+            "p.selling_price, p.status, u.username owner_name, m.name merchant_name, p.category_id, " +
+            "c.name category_name, p.created_by, p.created_at, p.updated_by, p.updated_at " +
             "from umkm.product p " +
             "inner join umkm.merchant m on p.merchant_id = m.id " +
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
+            "inner join umkm.category c on p.category_id = c.id " +
             "inner join auth.users u on um.user_id = u.id "
             ;
 
@@ -38,6 +39,8 @@ public class ProductRepository {
             m.setMerchantId(rs.getLong("merchant_id"));
             m.setMerchantName(rs.getString("merchant_name"));
             m.setOwnerName(rs.getString("owner_name"));
+            m.setCategoryId(rs.getLong("category_id"));
+            m.setCategoryName(rs.getString("category_name"));
 
             m.setCreatedBy(rs.getString("created_by"));
             m.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
@@ -81,9 +84,9 @@ public class ProductRepository {
 
     public void insert(ProductDto product) {
         String sqlInsert = "INSERT INTO umkm.product (merchant_id, sku, name, cost_price, selling_price, " +
-                "created_by, updated_by) " +
+                "category_id, status, created_by, updated_by) " +
                 "VALUES (?, ?, ?, ?, ?, " +
-                "?, ?) ";
+                "?, ?, ?) ";
 
         jdbcTemplate.update(
             sqlInsert,
@@ -92,6 +95,8 @@ public class ProductRepository {
             product.getName(),
             product.getCostPrice(),
             product.getSellingPrice(),
+            product.getCategoryId(),
+            product.getStatus(),
             product.getCreatedBy(),
             product.getCreatedBy()
         );
@@ -99,8 +104,8 @@ public class ProductRepository {
 
     public void update(ProductDto product) {
         String sql = "update umkm.product " +
-                "set name = ?, sku = ?, cost_price = ?, selling_price = ?, updated_by = ?, " +
-                "updated_at = now() " +
+                "set name = ?, sku = ?, cost_price = ?, selling_price = ?, category_id = ?, " +
+                "status = ?, updated_by = ?, updated_at = now() " +
                 "where id = ? ";
         jdbcTemplate.update(
                 sql,
@@ -108,6 +113,8 @@ public class ProductRepository {
                 product.getSku(),
                 product.getCostPrice(),
                 product.getSellingPrice(),
+                product.getCategoryId(),
+                product.getStatus(),
                 product.getUpdatedBy(),
                 product.getId()
         );
