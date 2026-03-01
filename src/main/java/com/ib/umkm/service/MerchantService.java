@@ -23,22 +23,22 @@ public class MerchantService {
         return merchantRepository.findByOwnerId(userId);
     }
 
-    public PageResult<MerchantDto> findPaged(int page, int size) {
+    public PageResult<MerchantDto> findPaged(int page, int size, String keyword) {
 
         int offset = page * size;
 
-        List<MerchantDto> merchants = merchantRepository.findAll(size, offset);
-        int total = merchantRepository.countAll();
+        List<MerchantDto> merchants = merchantRepository.findAll(size, offset, keyword);
+        int total = merchantRepository.countAll(keyword);
 
         return new PageResult<>(merchants, page, size, total);
     }
 
-    public PageResult<MerchantDto> findPagedByOwnerId(int page, int size, Long ownerId) {
+    public PageResult<MerchantDto> findPagedByOwnerId(int page, int size, Long ownerId, String keyword) {
 
         int offset = page * size;
 
-        List<MerchantDto> merchants = merchantRepository.findByOwnerId(size, offset, ownerId);
-        int total = merchantRepository.countAllByOwnerId(ownerId);
+        List<MerchantDto> merchants = merchantRepository.findByOwnerId(size, offset, ownerId, keyword);
+        int total = merchantRepository.countAllByOwnerId(ownerId, keyword);
 
         return new PageResult<>(merchants, page, size, total);
     }

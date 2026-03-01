@@ -40,25 +40,58 @@ public class MerchantRepository {
         return merchants;
     }
 
-    public List<MerchantDto> findAll(int limit, int offset) {
-        return jdbcTemplate.query(sql + " LIMIT ? OFFSET ? ",
+    public List<MerchantDto> findAll(int limit, int offset, String keyword) {
+        keyword = keyword.toUpperCase();
+        String sqlSelect = sql;
+        if (keyword != null && !keyword.equals("")) {
+            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') " +
+                    " LIMIT ? OFFSET ? ";
+            return jdbcTemplate.query(sqlSelect,
+                    new BeanPropertyRowMapper<>(MerchantDto.class),
+                    keyword, keyword,
+                    limit, offset);
+        }
+        sqlSelect += " LIMIT ? OFFSET ? ";
+
+        return jdbcTemplate.query(sqlSelect,
                 new BeanPropertyRowMapper<>(MerchantDto.class),
                 limit, offset);
     }
-    public List<MerchantDto> findByOwnerId(int limit, int offset, Long userId) {
+    public List<MerchantDto> findByOwnerId(int limit, int offset, Long userId, String keyword) {
+        keyword = keyword.toUpperCase();
+        String sqlSelect = sql;
+        if (keyword != null && !keyword.equals("")) {
+            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or m.name like CONCAT('%', ?, '%') " +
+                    " LIMIT ? OFFSET ? where um.user_id = ? ";
+            return jdbcTemplate.query(sqlSelect,
+                    new BeanPropertyRowMapper<>(MerchantDto.class),
+                    keyword, keyword,
+                    limit, offset, userId);
+        }
+
         String sqlFindByOwnerId = sql + " LIMIT ? OFFSET ? where um.user_id = ? ";
-        List<MerchantDto> merchants = jdbcTemplate.query(sqlFindByOwnerId,
+        return jdbcTemplate.query(sqlFindByOwnerId,
                 new BeanPropertyRowMapper<>(MerchantDto.class),
-                limit, offset);
-        return merchants;
+                keyword, keyword,
+                limit, offset, userId);
     }
 
-    public int countAll() {
-        return jdbcTemplate.queryForObject(sqlCount, Integer.class);
+    public int countAll(String keyword) {
+        keyword = keyword.toUpperCase();
+        String sqlSelectCount = sqlCount;
+        if (keyword != null && !keyword.equals("")) {
+            sqlSelectCount += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "%') ";
+            return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
+        }
+        return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
     }
 
-    public int countAllByOwnerId(long ownerId) {
+    public int countAllByOwnerId(long ownerId, String keyword) {
+        keyword = keyword.toUpperCase();
         String sqlCountByOwnerId = sqlCount + " where um.user_id = " + ownerId;
+        if (keyword != null && !keyword.equals("")) {
+            sqlCountByOwnerId += " and um.user_id = " + ownerId + " and upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "% ') ";
+        }
         return jdbcTemplate.queryForObject(sqlCountByOwnerId, Integer.class);
     }
 

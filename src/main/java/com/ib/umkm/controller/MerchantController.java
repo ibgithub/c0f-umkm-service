@@ -42,7 +42,8 @@ public class MerchantController {
     @GetMapping
     public ResponseEntity<ApiResponse<PageResult<MerchantDto>>> merchants(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword) {
 
         JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
@@ -52,9 +53,9 @@ public class MerchantController {
         PageResult<MerchantDto> result;
 
         if (jwtUser.getRole().contains("ADMIN")) {
-            result = merchantService.findPaged(page, size);
+            result = merchantService.findPaged(page, size, keyword);
         } else {
-            result = merchantService.findPagedByOwnerId(page, size, jwtUser.getUserId());
+            result = merchantService.findPagedByOwnerId(page, size, jwtUser.getUserId(), keyword);
         }
 
         ApiResponse<PageResult<MerchantDto>> response =
