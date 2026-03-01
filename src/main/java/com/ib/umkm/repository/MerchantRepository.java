@@ -2,6 +2,7 @@ package com.ib.umkm.repository;
 
 import com.ib.umkm.dto.MerchantDto;
 import com.ib.umkm.util.Constants;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -17,14 +18,48 @@ public class MerchantRepository {
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
             "inner join auth.users u on um.user_id = u.id "
             ;
-
+    String sqlCount = "SELECT COUNT(1) " +
+            "from umkm.merchant m " +
+            "inner join umkm.user_merchant um on um.merchant_id = m.id " +
+            "inner join auth.users u on um.user_id = u.id "
+            ;
     public MerchantRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public List<MerchantDto> findAll() {
-
         return jdbcTemplate.query(sql, merchantRowMapper());
+    }
+    public List<MerchantDto> findByOwnerId(Long userId) {
+        String sqlFindByOwnerId = sql + " where um.user_id = ? ";
+        List<MerchantDto> merchants = jdbcTemplate.query(
+                sqlFindByOwnerId,
+                merchantRowMapper(),
+                userId
+        );
+        return merchants;
+    }
+
+    public List<MerchantDto> findAll(int limit, int offset) {
+        return jdbcTemplate.query(sql + " LIMIT ? OFFSET ? ",
+                new BeanPropertyRowMapper<>(MerchantDto.class),
+                limit, offset);
+    }
+    public List<MerchantDto> findByOwnerId(int limit, int offset, Long userId) {
+        String sqlFindByOwnerId = sql + " LIMIT ? OFFSET ? where um.user_id = ? ";
+        List<MerchantDto> merchants = jdbcTemplate.query(sqlFindByOwnerId,
+                new BeanPropertyRowMapper<>(MerchantDto.class),
+                limit, offset);
+        return merchants;
+    }
+
+    public int countAll() {
+        return jdbcTemplate.queryForObject(sqlCount, Integer.class);
+    }
+
+    public int countAllByOwnerId(long ownerId) {
+        String sqlCountByOwnerId = sqlCount + " where um.user_id = " + ownerId;
+        return jdbcTemplate.queryForObject(sqlCountByOwnerId, Integer.class);
     }
 
     private RowMapper<MerchantDto> merchantRowMapper() {
@@ -53,16 +88,6 @@ public class MerchantRepository {
                 id
         );
         return merchantDto;
-    }
-
-    public List<MerchantDto> findByOwnerId(Long userId) {
-        String sqlFindByOwnerId = sql + " where um.user_id = ? ";
-        List<MerchantDto> merchants = jdbcTemplate.query(
-                sqlFindByOwnerId,
-                merchantRowMapper(),
-                userId
-        );
-        return merchants;
     }
 
     public void insert(MerchantDto merchant) {
