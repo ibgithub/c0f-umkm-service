@@ -1,13 +1,13 @@
 package com.ib.umkm.controller;
 
+import com.ib.umkm.common.ApiResponse;
+import com.ib.umkm.common.PageResult;
 import com.ib.umkm.dto.CategoryDto;
 import com.ib.umkm.security.JwtUser;
 import com.ib.umkm.service.CategoryService;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -20,18 +20,33 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<CategoryDto> categories(Authentication authentication) {
+    public ResponseEntity<ApiResponse<PageResult<CategoryDto>>> categories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword) {
 
         JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
+        PageResult<CategoryDto> result;
+
         if (jwtUser.getRole().contains("ADMIN")) {
-            return categoryService.getAllCategories();
+            result = categoryService.findPaged(page, size, keyword);
+        } else {
+            result = categoryService.findPagedByOwnerId(page, size, jwtUser.getUserId(), keyword);
         }
 
-        return categoryService.getCategoriesByOwnerId(jwtUser.getUserId());
+        ApiResponse<PageResult<CategoryDto>> response =
+                new ApiResponse<>(
+                        true,
+                        "SUCCESS",
+                        "Categories fetched successfully",
+                        result
+                );
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping

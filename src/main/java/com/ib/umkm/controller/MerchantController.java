@@ -90,13 +90,13 @@ public class MerchantController {
             @PathVariable Long id,
             @RequestBody MerchantDto request
     ) {
-        String username = (String) SecurityContextHolder
-            .getContext()
-            .getAuthentication()
-            .getPrincipal();
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
 
         request.setId(id);
-        merchantService.updateMerchant(request, username);
+        merchantService.updateMerchant(request, jwtUser.getUsername());
     }
 
 }

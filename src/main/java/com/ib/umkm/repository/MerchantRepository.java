@@ -41,9 +41,9 @@ public class MerchantRepository {
     }
 
     public List<MerchantDto> findAll(int limit, int offset, String keyword) {
-        keyword = keyword.toUpperCase();
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
+            keyword = keyword.toUpperCase();
             sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') " +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
@@ -58,9 +58,9 @@ public class MerchantRepository {
                 limit, offset);
     }
     public List<MerchantDto> findByOwnerId(int limit, int offset, Long userId, String keyword) {
-        keyword = keyword.toUpperCase();
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
+            keyword = keyword.toUpperCase();
             sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or m.name like CONCAT('%', ?, '%') " +
                     " LIMIT ? OFFSET ? where um.user_id = ? ";
             return jdbcTemplate.query(sqlSelect,
@@ -77,9 +77,9 @@ public class MerchantRepository {
     }
 
     public int countAll(String keyword) {
-        keyword = keyword.toUpperCase();
         String sqlSelectCount = sqlCount;
         if (keyword != null && !keyword.equals("")) {
+            keyword = keyword.toUpperCase();
             sqlSelectCount += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "%') ";
             return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
         }
@@ -87,9 +87,9 @@ public class MerchantRepository {
     }
 
     public int countAllByOwnerId(long ownerId, String keyword) {
-        keyword = keyword.toUpperCase();
         String sqlCountByOwnerId = sqlCount + " where um.user_id = " + ownerId;
         if (keyword != null && !keyword.equals("")) {
+            keyword = keyword.toUpperCase();
             sqlCountByOwnerId += " and um.user_id = " + ownerId + " and upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "% ') ";
         }
         return jdbcTemplate.queryForObject(sqlCountByOwnerId, Integer.class);

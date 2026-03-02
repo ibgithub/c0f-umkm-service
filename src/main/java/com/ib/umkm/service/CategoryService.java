@@ -1,5 +1,6 @@
 package com.ib.umkm.service;
 
+import com.ib.umkm.common.PageResult;
 import com.ib.umkm.dto.CategoryDto;
 import com.ib.umkm.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,24 @@ public class CategoryService {
     public List<CategoryDto> getAllCategories() {
         return categoryRepository.findAll();
     }
-    public List<CategoryDto> getCategoriesByOwnerId(Long merchantId) {
-        return categoryRepository.findByOwnerId(merchantId);
+
+    public PageResult<CategoryDto> findPaged(int page, int size, String keyword) {
+        int offset = page * size;
+
+        List<CategoryDto> categories = categoryRepository.findAll(size, offset, keyword);
+        int total = categoryRepository.countAll(keyword);
+
+        return new PageResult<>(categories, page, size, total);
+    }
+
+    public PageResult<CategoryDto> findPagedByOwnerId(int page, int size, Long ownerId, String keyword) {
+
+        int offset = page * size;
+
+        List<CategoryDto> categories = categoryRepository.findByOwnerId(size, offset, ownerId, keyword);
+        int total = categoryRepository.countAllByOwnerId(ownerId, keyword);
+
+        return new PageResult<>(categories, page, size, total);
     }
 
     public CategoryDto getById(Long id) {
