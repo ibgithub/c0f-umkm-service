@@ -23,7 +23,7 @@ public class MerchantRepository {
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
             "inner join auth.users u on um.user_id = u.id "
             ;
-    String order_by = " order by m.name ";
+    String order_by = " order by u.first_name, m.name ";
     public MerchantRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }

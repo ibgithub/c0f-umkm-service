@@ -134,7 +134,7 @@ public class CategoryRepository {
 
     public void update(CategoryDto category) {
         String sql = "update umkm.category " +
-                "set merchant_id = ?, name = ?, description = ?, status = ?, updated_by = ?, " +
+                "set merchant_id = ?, name = ?, description = ?, status = ?, updated_by = ? " +
                 "where id = ? ";
         jdbcTemplate.update(
                 sql,

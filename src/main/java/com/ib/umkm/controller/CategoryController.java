@@ -70,13 +70,13 @@ public class CategoryController {
             @PathVariable Long id,
             @RequestBody CategoryDto category
     ) {
-        String username = (String) SecurityContextHolder
-            .getContext()
-            .getAuthentication()
-            .getPrincipal();
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
 
         category.setId(id);
-        categoryService.updateCategory(category, username);
+        categoryService.updateCategory(category, jwtUser.getUsername());
     }
 
 }
