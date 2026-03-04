@@ -26,6 +26,7 @@ public class CategoryRepository {
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
             "inner join auth.users u on um.user_id = u.id"
             ;
+    String order_by = " order by m.name, c.name ";
 
     public CategoryRepository(JdbcTemplate jdbcTemplate, SqlDataSourceScriptDatabaseInitializer sqlDataSourceScriptDatabaseInitializer) {
         this.jdbcTemplate = jdbcTemplate;
@@ -41,13 +42,14 @@ public class CategoryRepository {
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
             sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') " +
+                    order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     new BeanPropertyRowMapper<>(CategoryDto.class),
                     keyword, keyword,
                     limit, offset);
         }
-        sqlSelect += " LIMIT ? OFFSET ? ";
+        sqlSelect += order_by + " LIMIT ? OFFSET ? ";
 
         return jdbcTemplate.query(sqlSelect,
                 new BeanPropertyRowMapper<>(CategoryDto.class),
@@ -59,13 +61,14 @@ public class CategoryRepository {
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
             sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') " +
+                    order_by +
                     " LIMIT ? OFFSET ? where um.user_id = ? ";
             return jdbcTemplate.query(sqlSelect,
                     new BeanPropertyRowMapper<>(CategoryDto.class),
                     keyword, keyword,
                     limit, offset, userId);
         }
-        String sqlFindByOwnerId = sql + " LIMIT ? OFFSET ? where um.user_id = ? ";
+        String sqlFindByOwnerId = sql + order_by + " LIMIT ? OFFSET ? where um.user_id = ? ";
         return jdbcTemplate.query(sqlFindByOwnerId,
                 new BeanPropertyRowMapper<>(CategoryDto.class),
                 keyword, keyword,
