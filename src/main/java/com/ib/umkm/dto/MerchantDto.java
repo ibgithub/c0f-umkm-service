@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class MerchantDto {
     private Long id;
     private String name;
-    private Integer status;
+    private String status;
     private Long ownerId;
     private String ownerName;
 
@@ -46,11 +46,11 @@ public class MerchantDto {
         this.ownerName = ownerName;
     }
 
-    public Integer getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

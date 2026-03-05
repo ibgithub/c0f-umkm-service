@@ -6,8 +6,11 @@ import com.ib.umkm.dto.CategoryDto;
 import com.ib.umkm.security.JwtUser;
 import com.ib.umkm.service.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -17,6 +20,24 @@ public class CategoryController {
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
+    }
+
+    @GetMapping("/data")
+    public List<CategoryDto> categories(Authentication authentication) {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (jwtUser.getRole().contains("ADMIN")) {
+            return categoryService.getAllCategories();
+        }
+        return categoryService.getCategoriesByOwnerId(jwtUser.getUserId());
+    }
+
+    @GetMapping("/byMerchant/{merchantId}")
+    public List<CategoryDto> categoriesByMerchant(@PathVariable Long merchantId) {
+        return categoryService.getCategoriesByMerchantId(merchantId);
     }
 
     @GetMapping

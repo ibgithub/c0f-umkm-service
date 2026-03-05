@@ -2,7 +2,6 @@ package com.ib.umkm.repository;
 
 import com.ib.umkm.dto.MerchantDto;
 import com.ib.umkm.util.Constants;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -68,14 +67,14 @@ public class MerchantRepository {
                     order_by +
                     " LIMIT ? OFFSET ? where ";
             return jdbcTemplate.query(sqlSelect,
-                    new BeanPropertyRowMapper<>(MerchantDto.class),
+                    merchantRowMapper,
                     keyword, keyword, userId,
                     limit, offset);
         }
 
         String sqlFindByOwnerId = sql + " where um.user_id = ? " + order_by + " LIMIT ? OFFSET ? " ;
         return jdbcTemplate.query(sqlFindByOwnerId,
-                new BeanPropertyRowMapper<>(MerchantDto.class),
+                merchantRowMapper,
                 userId,
                 limit, offset);
     }
@@ -91,10 +90,10 @@ public class MerchantRepository {
     }
 
     public int countAllByOwnerId(long ownerId, String keyword) {
-        String sqlCountByOwnerId = sqlCount + " where um.user_id = " + ownerId + order_by;
+        String sqlCountByOwnerId = sqlCount + " where um.user_id = " + ownerId ;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlCountByOwnerId += " and um.user_id = " + ownerId + " and ( upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "% ') ) " + order_by;
+            sqlCountByOwnerId += " and um.user_id = " + ownerId + " and ( upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "% ') ) " ;
         }
         return jdbcTemplate.queryForObject(sqlCountByOwnerId, Integer.class);
     }
@@ -110,6 +109,7 @@ public class MerchantRepository {
         String fullName = firstName + (lastName.isEmpty() ? "" : " " + lastName);
         m.setOwnerName(fullName);
         m.setOwnerId(rs.getLong("owner_id"));
+        m.setStatus(rs.getString("status"));
 
         m.setCreatedBy(rs.getString("created_by"));
         m.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
@@ -131,13 +131,14 @@ public class MerchantRepository {
     }
 
     public void insert(MerchantDto merchant) {
-        String sqlInsert = "INSERT INTO umkm.merchant (name, created_by, updated_by) " +
-                "VALUES (?, ?, ?) RETURNING id";
+        String sqlInsert = "INSERT INTO umkm.merchant (name, status, created_by, updated_by) " +
+                "VALUES (?, ?, ?, ?) RETURNING id";
 
         Long merchantId = jdbcTemplate.queryForObject(
                 sqlInsert,
                 Long.class,
                 merchant.getName(),
+                merchant.getStatus(),
                 merchant.getCreatedBy(),
                 merchant.getCreatedBy()
         );
@@ -157,11 +158,12 @@ public class MerchantRepository {
 
     public void update(MerchantDto merchant) {
         String sql = "update umkm.merchant " +
-                "set name = ?, updated_by = ?, updated_at = now() " +
+                "set name = ?, status = ?, updated_by = ?, updated_at = now() " +
                 "where id = ? ";
         jdbcTemplate.update(
                 sql,
                 merchant.getName(),
+                merchant.getStatus(),
                 merchant.getUpdatedBy(),
                 merchant.getId()
         );

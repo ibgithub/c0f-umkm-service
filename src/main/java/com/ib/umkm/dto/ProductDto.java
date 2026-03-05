@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 
 public class ProductDto {
     private Long id;
-    private String sku;
     private String name;
     private BigDecimal costPrice;
     private BigDecimal sellingPrice;
@@ -15,7 +14,7 @@ public class ProductDto {
     private String OwnerName;
     private Long categoryId;
     private String categoryName;
-    private Long status;
+    private String status;
 
     private String createdBy;
     private LocalDateTime createdAt;
@@ -36,14 +35,6 @@ public class ProductDto {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
     }
 
     public BigDecimal getCostPrice() {
@@ -110,11 +101,11 @@ public class ProductDto {
         this.categoryName = categoryName;
     }
 
-    public Long getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Long status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

@@ -1,12 +1,13 @@
 package com.ib.umkm.controller;
 
+import com.ib.umkm.common.ApiResponse;
+import com.ib.umkm.common.PageResult;
 import com.ib.umkm.dto.ProductDto;
 import com.ib.umkm.security.JwtUser;
 import com.ib.umkm.service.ProductService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -19,17 +20,33 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductDto> products() {
+    public ResponseEntity<ApiResponse<PageResult<ProductDto>>> categories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword) {
+
         JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
+        PageResult<ProductDto> result;
+
         if (jwtUser.getRole().contains("ADMIN")) {
-            return productService.getAllProducts();
+            result = productService.findPaged(page, size, keyword);
+        } else {
+            result = productService.findPagedByOwnerId(page, size, jwtUser.getUserId(), keyword);
         }
 
-        return productService.getProductsByOwnerId(jwtUser.getUserId());
+        ApiResponse<PageResult<ProductDto>> response =
+                new ApiResponse<>(
+                        true,
+                        "SUCCESS",
+                        "Products fetched successfully",
+                        result
+                );
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping

@@ -20,6 +20,12 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
+    public List<CategoryDto> getCategoriesByOwnerId(Long userId) {
+        return categoryRepository.findByOwnerId(userId);
+    }
+    public List<CategoryDto> getCategoriesByMerchantId(Long merchantId) {
+        return categoryRepository.findByMerchantId(merchantId);
+    }
     public PageResult<CategoryDto> findPaged(int page, int size, String keyword) {
         int offset = page * size;
 

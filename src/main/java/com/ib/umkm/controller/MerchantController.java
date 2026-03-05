@@ -24,9 +24,6 @@ public class MerchantController {
 
     @GetMapping("/data")
     public List<MerchantDto> merchants(Authentication authentication) {
-        String username = authentication.getName();
-        System.out.println("Request by: " + username);
-
         JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -35,7 +32,6 @@ public class MerchantController {
         if (jwtUser.getRole().contains("ADMIN")) {
             return merchantService.getAllMerchants();
         }
-
         return merchantService.getMerchantsByOwnerId(jwtUser.getUserId());
     }
 

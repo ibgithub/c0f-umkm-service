@@ -1,7 +1,6 @@
 package com.ib.umkm.repository;
 
 import com.ib.umkm.dto.CategoryDto;
-import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDatabaseInitializer;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,7 +11,6 @@ import java.util.List;
 @Repository
 public class CategoryRepository {
     private final JdbcTemplate jdbcTemplate;
-    private final SqlDataSourceScriptDatabaseInitializer sqlDataSourceScriptDatabaseInitializer;
     String sql = "select c.id, c.merchant_id, c.name, c.description, c.status, " +
             "m.name merchant_name, u.username owner_name, um.user_id owner_id " +
             "from umkm.category c " +
@@ -28,13 +26,30 @@ public class CategoryRepository {
             ;
     String order_by = " order by m.name, c.name ";
 
-    public CategoryRepository(JdbcTemplate jdbcTemplate, SqlDataSourceScriptDatabaseInitializer sqlDataSourceScriptDatabaseInitializer) {
+    public CategoryRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.sqlDataSourceScriptDatabaseInitializer = sqlDataSourceScriptDatabaseInitializer;
     }
 
     public List<CategoryDto> findAll() {
         return jdbcTemplate.query(sql, categoryRowMapper());
+    }
+    public List<CategoryDto> findByOwnerId(Long userId) {
+        String sqlFindByOwnerId = sql + " where um.user_id = ? " + order_by;
+        List<CategoryDto> categories = jdbcTemplate.query(
+                sqlFindByOwnerId,
+                categoryRowMapper(),
+                userId
+        );
+        return categories;
+    }
+    public List<CategoryDto> findByMerchantId(Long merchantId) {
+        String sqlFindByOwnerId = sql + " where c.merchant_id = ? " + order_by;
+        List<CategoryDto> categories = jdbcTemplate.query(
+                sqlFindByOwnerId,
+                categoryRowMapper(),
+                merchantId
+        );
+        return categories;
     }
 
     public List<CategoryDto> findAll(int limit, int offset, String keyword) {
@@ -60,19 +75,21 @@ public class CategoryRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') " +
+            sqlSelect += " where ( upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') ) " +
+                    "um.user_id = ? " +
                     order_by +
-                    " LIMIT ? OFFSET ? where um.user_id = ? ";
+                    " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     new BeanPropertyRowMapper<>(CategoryDto.class),
-                    keyword, keyword,
-                    limit, offset, userId);
+                    keyword, keyword, keyword,
+                    userId,
+                    limit, offset );
         }
-        String sqlFindByOwnerId = sql + order_by + " LIMIT ? OFFSET ? where um.user_id = ? ";
+        String sqlFindByOwnerId = sql + " where um.user_id = ? " + order_by + " LIMIT ? OFFSET ? " ;
         return jdbcTemplate.query(sqlFindByOwnerId,
                 new BeanPropertyRowMapper<>(CategoryDto.class),
-                keyword, keyword,
-                limit, offset, userId);
+                userId,
+                limit, offset);
     }
 
     public int countAll(String keyword) {
@@ -89,7 +106,7 @@ public class CategoryRepository {
         String sqlCountByOwnerId = sqlCount + " where um.user_id = " + ownerId;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlCountByOwnerId += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "%') or upper(c.name) like CONCAT('%" + keyword + "%') ";
+            sqlCountByOwnerId += " and upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "%') or upper(c.name) like CONCAT('%" + keyword + "%') ";
         }
         return jdbcTemplate.queryForObject(sqlCountByOwnerId, Integer.class);
     }
@@ -102,6 +119,7 @@ public class CategoryRepository {
             c.setDescription(rs.getString("description"));
             c.setMerchantId(rs.getLong("merchant_id"));
             c.setMerchantName(rs.getString("merchant_name"));
+            c.setStatus(rs.getString("status"));
             return c;
         };
     }
