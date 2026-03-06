@@ -56,12 +56,12 @@ public class OutletRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where upper(m.name) like CONCAT('%', ?, '%') or upper(o.name) like CONCAT('%', ?, '%') " +
+            sqlSelect += " where upper(m.name) like CONCAT('%', ?, '%') or upper(o.name) like CONCAT('%', ?, '%') or upper(o.address) like CONCAT('%', ?, '%') " +
                     order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     new BeanPropertyRowMapper<>(OutletDto.class),
-                    keyword, keyword,
+                    keyword, keyword, keyword,
                     limit, offset);
         }
         sqlSelect += order_by + " LIMIT ? OFFSET ? ";
@@ -75,13 +75,13 @@ public class OutletRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where ( upper(m.name) like CONCAT('%', ?, '%') or upper(o.name) like CONCAT('%', ?, '%') ) " +
+            sqlSelect += " where ( upper(m.name) like CONCAT('%', ?, '%') or upper(o.name) like CONCAT('%', ?, '%') or upper(o.address) like CONCAT('%', ?, '%') ) " +
                     "um.user_id = ? " +
                     order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     new BeanPropertyRowMapper<>(OutletDto.class),
-                    keyword, keyword, keyword, keyword,
+                    keyword, keyword, keyword,
                     userId,
                     limit, offset );
         }
@@ -156,7 +156,7 @@ public class OutletRepository {
     }
 
     public void update(OutletDto outlet) {
-        String sql = "update umkm.category " +
+        String sql = "update umkm.outlet " +
                 "set merchant_id = ?, name = ?, address = ?, status = ?, updated_by = ? " +
                 "where id = ? ";
         jdbcTemplate.update(
