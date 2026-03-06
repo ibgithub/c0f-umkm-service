@@ -56,7 +56,7 @@ public class CategoryRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') " +
+            sqlSelect += " where upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') " +
                     order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
@@ -75,13 +75,13 @@ public class CategoryRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where ( upper(u.username) like CONCAT('%', ?, '%') or upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') ) " +
+            sqlSelect += " where ( upper(m.name) like CONCAT('%', ?, '%') or upper(c.name) like CONCAT('%', ?, '%') ) " +
                     "um.user_id = ? " +
                     order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     new BeanPropertyRowMapper<>(CategoryDto.class),
-                    keyword, keyword, keyword,
+                    keyword, keyword,
                     userId,
                     limit, offset );
         }
@@ -96,7 +96,7 @@ public class CategoryRepository {
         String sqlSelectCount = sqlCount;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelectCount += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "%') or upper(c.name) like CONCAT('%" + keyword + "%') ";
+            sqlSelectCount += " where upper(m.name) like CONCAT('%" + keyword + "%') or upper(c.name) like CONCAT('%" + keyword + "%') ";
             return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
         }
         return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
@@ -106,7 +106,7 @@ public class CategoryRepository {
         String sqlCountByOwnerId = sqlCount + " where um.user_id = " + ownerId;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlCountByOwnerId += " and upper(u.username) like CONCAT('%" + keyword + "%') or upper(m.name) like CONCAT('%" + keyword + "%') or upper(c.name) like CONCAT('%" + keyword + "%') ";
+            sqlCountByOwnerId += " and upper(m.name) like CONCAT('%" + keyword + "%') or upper(c.name) like CONCAT('%" + keyword + "%') ";
         }
         return jdbcTemplate.queryForObject(sqlCountByOwnerId, Integer.class);
     }
