@@ -32,7 +32,7 @@ public class OutletController {
         if (jwtUser.getRole().contains("ADMIN")) {
             return outletService.getOutlets();
         }
-        return outletService.getCategoriesByOwnerId(jwtUser.getUserId());
+        return outletService.getOutletsByOwnerId(jwtUser.getUserId());
     }
 
     @GetMapping("/byMerchant/{merchantId}")
@@ -87,7 +87,7 @@ public class OutletController {
     }
 
     @PutMapping("/{id}")
-    public void updateUser(
+    public void updateOutlet(
             @PathVariable Long id,
             @RequestBody OutletDto outlet
     ) {

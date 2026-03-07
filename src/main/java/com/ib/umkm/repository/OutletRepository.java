@@ -76,7 +76,7 @@ public class OutletRepository {
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
             sqlSelect += " where ( upper(m.name) like CONCAT('%', ?, '%') or upper(o.name) like CONCAT('%', ?, '%') or upper(o.address) like CONCAT('%', ?, '%') ) " +
-                    "um.user_id = ? " +
+                    "and um.user_id = ? " +
                     order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,

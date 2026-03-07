@@ -82,7 +82,7 @@ public class MerchantController {
     }
 
     @PutMapping("/{id}")
-    public void updateUser(
+    public void updateMerchant(
             @PathVariable Long id,
             @RequestBody MerchantDto request
     ) {

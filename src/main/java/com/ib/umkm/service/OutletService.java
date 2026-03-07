@@ -20,7 +20,7 @@ public class OutletService {
         return outletRepository.findAll();
     }
 
-    public List<OutletDto> getCategoriesByOwnerId(Long userId) {
+    public List<OutletDto> getOutletsByOwnerId(Long userId) {
         return outletRepository.findByOwnerId(userId);
     }
     public List<OutletDto> getOutletsByMerchantId(Long merchantId) {

@@ -2,9 +2,9 @@ package com.ib.umkm.controller;
 
 import com.ib.umkm.common.ApiResponse;
 import com.ib.umkm.common.PageResult;
-import com.ib.umkm.dto.CategoryDto;
+import com.ib.umkm.dto.OutletStaffDto;
 import com.ib.umkm.security.JwtUser;
-import com.ib.umkm.service.CategoryService;
+import com.ib.umkm.service.OutletStaffService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,35 +13,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories")
-public class CategoryController {
+@RequestMapping("/api/outlet-staffs")
+public class OutletStaffController {
 
-    private final CategoryService categoryService;
+    private final OutletStaffService outletStaffService;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public OutletStaffController(OutletStaffService outletStaffService) {
+        this.outletStaffService = outletStaffService;
     }
 
     @GetMapping("/data")
-    public List<CategoryDto> categories(Authentication authentication) {
+    public List<OutletStaffDto> outlets(Authentication authentication) {
         JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
         if (jwtUser.getRole().contains("ADMIN")) {
-            return categoryService.getAllCategories();
+            return outletStaffService.getOutletStaffs();
         }
-        return categoryService.getCategoriesByOwnerId(jwtUser.getUserId());
-    }
-
-    @GetMapping("/byMerchant/{merchantId}")
-    public List<CategoryDto> categoriesByMerchant(@PathVariable Long merchantId) {
-        return categoryService.getCategoriesByMerchantId(merchantId);
+        return outletStaffService.getOutletStaffsByOwnerId(jwtUser.getUserId());
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResult<CategoryDto>>> categories(
+    public ResponseEntity<ApiResponse<PageResult<OutletStaffDto>>> outlets(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
@@ -51,19 +46,19 @@ public class CategoryController {
                 .getAuthentication()
                 .getPrincipal();
 
-        PageResult<CategoryDto> result;
+        PageResult<OutletStaffDto> result;
 
         if (jwtUser.getRole().contains("ADMIN")) {
-            result = categoryService.findPaged(page, size, keyword);
+            result = outletStaffService.findPaged(page, size, keyword);
         } else {
-            result = categoryService.findPagedByOwnerId(page, size, jwtUser.getUserId(), keyword);
+            result = outletStaffService.findPagedByOwnerId(page, size, jwtUser.getUserId(), keyword);
         }
 
-        ApiResponse<PageResult<CategoryDto>> response =
+        ApiResponse<PageResult<OutletStaffDto>> response =
                 new ApiResponse<>(
                         true,
                         "SUCCESS",
-                        "Categories fetched successfully",
+                        "Outlet Staffs fetched successfully",
                         result
                 );
 
@@ -71,33 +66,32 @@ public class CategoryController {
     }
 
     @PostMapping
-    public void createCategory(@RequestBody CategoryDto request) {
+    public void createOutlet(@RequestBody OutletStaffDto request) {
 
         JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
-        categoryService.createCategory(request, jwtUser.getUsername());
+        outletStaffService.createOutletStaff(request, jwtUser.getUsername());
     }
 
     @GetMapping("/{id}")
-    public CategoryDto getById(@PathVariable Long id) {
-        return categoryService.getById(id);
+    public OutletStaffDto getById(@PathVariable Long id) {
+        return outletStaffService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public void updateCategory(
+    public void updateOutletStaff(
             @PathVariable Long id,
-            @RequestBody CategoryDto category
+            @RequestBody OutletStaffDto outletStaff
     ) {
         JwtUser jwtUser = (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
 
-        category.setId(id);
-        categoryService.updateCategory(category, jwtUser.getUsername());
+        outletStaff.setId(id);
+        outletStaffService.updateOutletStaff(outletStaff, jwtUser.getUsername());
     }
-
 }
