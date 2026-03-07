@@ -43,10 +43,12 @@ public class OutletRepository {
         return outlets;
     }
     public List<OutletDto> findByMerchantId(Long merchantId) {
-        String sqlFindByOwnerId = sql + " where o.merchant_id = ? " + order_by;
+        String sqlFindByOwnerId = "select o.id, o.name from umkm.outlet o " +
+                "inner join umkm.merchant m on m.id = o.merchant_id " +
+                "where o.merchant_id = ? " + order_by;
         List<OutletDto> outlets = jdbcTemplate.query(
                 sqlFindByOwnerId,
-                outletRowMapper(),
+                outletLabelRowMapper(),
                 merchantId
         );
         return outlets;
@@ -129,7 +131,14 @@ public class OutletRepository {
             return dto;
         };
     }
-
+    private RowMapper<OutletDto> outletLabelRowMapper() {
+        return (rs, rowNum) -> {
+            OutletDto dto = new OutletDto();
+            dto.setId(rs.getLong("id"));
+            dto.setName(rs.getString("name"));
+            return dto;
+        };
+    }
     public OutletDto findById(Long id) {
         String sqlFindById = sql + " where o.id = ? ";
         OutletDto outletDto = jdbcTemplate.queryForObject(

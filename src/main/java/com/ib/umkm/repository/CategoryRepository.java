@@ -42,6 +42,7 @@ public class CategoryRepository {
         );
         return categories;
     }
+
     public List<CategoryDto> findByMerchantId(Long merchantId) {
         String sqlFindByOwnerId = sql + " where c.merchant_id = ? " + order_by;
         List<CategoryDto> categories = jdbcTemplate.query(
