@@ -13,15 +13,15 @@ public class OutletStaffRepository {
     String sql = "select um.id user_merchant_id, m.id merchant_id, m.name merchant_name, o.id outlet_id, o.name outlet_name, " +
             "u.id user_id, u.username, u.first_name, u.last_name, um.business_role, " +
             "um.status " +
-            "from umkm.outlet o " +
-            "inner join umkm.merchant m on m.id = o.merchant_id " +
-            "inner join umkm.user_merchant um on um.merchant_id = m.id " +
+            "from umkm.user_merchant um " +
+            "inner join umkm.merchant m on m.id = um.merchant_id " +
+            "left join umkm.outlet o on o.merchant_id = m.id " +
             "inner join auth.users u on um.user_id = u.id "
             ;
     String sqlCount = "SELECT COUNT(1) " +
-            "from umkm.outlet o " +
-            "inner join umkm.merchant m on m.id = o.merchant_id " +
-            "inner join umkm.user_merchant um on um.merchant_id = m.id " +
+            "from umkm.user_merchant um " +
+            "inner join umkm.merchant m on m.id = um.merchant_id " +
+            "left join umkm.outlet o on o.merchant_id = m.id " +
             "inner join auth.users u on um.user_id = u.id "
             ;
     String order_by = " order by m.name, o.name, u.first_name, u.last_name ";
@@ -34,7 +34,9 @@ public class OutletStaffRepository {
         return jdbcTemplate.query(sql, outletStaffRowMapper());
     }
     public List<OutletStaffDto> findByOwnerId(Long userId) {
-        String sqlFindByOwnerId = sql + " where o.id in (select id from umkm.outlet where um.user_id = ? and um.business_role = 'OWNER') " + order_by;
+        String sqlFindByOwnerId = sql + " where um.merchant_id in " +
+                "(select um2.merchant_id from umkm.user_merchant um2 " +
+                "where um2.business_role = 'OWNER' and um2.user_id = ? ) " + order_by;
         List<OutletStaffDto> outletStaffs = jdbcTemplate.query(
                 sqlFindByOwnerId,
                 outletStaffRowMapper(),
@@ -76,7 +78,9 @@ public class OutletStaffRepository {
                     userId,
                     limit, offset );
         }
-        String sqlFindByOwnerId = sql + " where o.id in (select id from umkm.outlet where um.user_id = ? and um.business_role = 'OWNER') " + order_by + " LIMIT ? OFFSET ? " ;
+        String sqlFindByOwnerId = sql + " where um.merchant_id in " +
+                "(select um2.merchant_id from umkm.user_merchant um2 " +
+                "where um2.business_role = 'OWNER' and um2.user_id = ? ) " + order_by + " LIMIT ? OFFSET ? " ;
         return jdbcTemplate.query(sqlFindByOwnerId,
                 outletStaffRowMapper(),
                 userId,
@@ -94,7 +98,9 @@ public class OutletStaffRepository {
     }
 
     public int countAllByOwnerId(long ownerId, String keyword) {
-        String sqlCountByOwnerId = sqlCount + " where o.id in (select id from umkm.outlet where um.user_id = "+ ownerId + " and um.business_role = 'OWNER') " ;
+        String sqlCountByOwnerId = sqlCount + " where um.merchant_id in " +
+                "(select um2.merchant_id from umkm.user_merchant um2 " +
+                "where um2.business_role = 'OWNER' and um2.user_id = "+ ownerId + ") " ;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
             sqlCountByOwnerId += " and ( upper(m.name) like CONCAT('%" + keyword + "%') or upper(o.name) like CONCAT('%" + keyword + "%') or upper(u.username) like CONCAT('%" + keyword + "%') or upper(u.first_name) like CONCAT('%" + keyword + "%') or upper(u.last_name) like CONCAT('%" + keyword + "%') )  ";

@@ -143,14 +143,15 @@ public class MerchantRepository {
                 merchant.getCreatedBy()
         );
 
-        String sqlInsertUserMerchant = "INSERT INTO umkm.user_merchant (user_id, merchant_id, business_role, created_by, updated_by) " +
-                "VALUES (?, ?, ?, ?, ? )";
+        String sqlInsertUserMerchant = "INSERT INTO umkm.user_merchant (user_id, merchant_id, business_role, status, created_by, updated_by) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(
                 sqlInsertUserMerchant,
                 merchant.getOwnerId(),
                 merchantId,
                 Constants.OWNER,
+                merchant.getStatus(),
                 merchant.getCreatedBy(),
                 merchant.getCreatedBy()
         );
