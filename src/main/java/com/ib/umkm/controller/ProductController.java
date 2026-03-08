@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -17,6 +19,11 @@ public class ProductController {
 
     public ProductController(ProductService productService) {
         this.productService = productService;
+    }
+
+    @GetMapping("/byMerchant/{merchantId}")
+    public List<ProductDto> productsByMerchant(@PathVariable Long merchantId) {
+        return productService.getProductsByMerchantId(merchantId);
     }
 
     @GetMapping

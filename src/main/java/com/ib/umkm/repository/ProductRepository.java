@@ -20,6 +20,10 @@ public class ProductRepository {
             "inner join umkm.category c on p.category_id = c.id " +
             "inner join auth.users u on um.user_id = u.id "
             ;
+    String sqlSimple = "select p.id, p.merchant_id, p.name, p.cost_price, " +
+            "p.selling_price, p.status, p.category_id " +
+            "from umkm.product p "
+            ;
     String sqlCount = "SELECT COUNT(1) " +
             "from umkm.product p " +
             "inner join umkm.merchant m on p.merchant_id = m.id " +
@@ -119,11 +123,24 @@ public class ProductRepository {
         };
     }
 
+    private RowMapper<ProductDto> productSimpleRowMapper() {
+        return (rs, rowNum) -> {
+            ProductDto m = new ProductDto();
+            m.setId(rs.getLong("id"));
+            m.setName(rs.getString("name"));
+            m.setCostPrice(rs.getBigDecimal("cost_price"));
+            m.setSellingPrice(rs.getBigDecimal("selling_price"));
+            m.setMerchantId(rs.getLong("merchant_id"));
+            m.setCategoryId(rs.getLong("category_id"));
+            return m;
+        };
+    }
+
     public ProductDto findById(Long id) {
-        String sqlFindById = sql + " where p.id = ? ";
+        String sqlFindById = sqlSimple + " where p.id = ? ";
         ProductDto productDto = jdbcTemplate.queryForObject(
                 sqlFindById,
-                productRowMapper(),
+                productSimpleRowMapper(),
                 id
         );
         return productDto;
@@ -140,10 +157,10 @@ public class ProductRepository {
     }
 
     public List<ProductDto> findByMerchantId(Long merchantId) {
-        String sqlFindByOwnerId = sql + " where p.merchant_id = ? ";
+        String sqlFindByOwnerId = sqlSimple + " where p.merchant_id = ? ";
         List<ProductDto> products = jdbcTemplate.query(
                 sqlFindByOwnerId,
-                productRowMapper(),
+                productSimpleRowMapper(),
                 merchantId
         );
         return products;

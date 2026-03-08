@@ -16,7 +16,12 @@ public class CategoryRepository {
             "from umkm.category c " +
             "inner join umkm.merchant m on c.merchant_id = m.id " +
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
-            "inner join auth.users u on um.user_id = u.id"
+            "inner join auth.users u on um.user_id = u.id "
+            ;
+    String sqlSimple = "select c.id, c.merchant_id, c.name, c.description, c.status, " +
+            "m.name merchant_name " +
+            "from umkm.category c " +
+            "inner join umkm.merchant m on c.merchant_id = m.id "
             ;
     String sqlCount = "SELECT COUNT(1) " +
             "from umkm.category c " +
@@ -44,10 +49,10 @@ public class CategoryRepository {
     }
 
     public List<CategoryDto> findByMerchantId(Long merchantId) {
-        String sqlFindByOwnerId = sql + " where c.merchant_id = ? " + order_by;
+        String sqlFindByOwnerId = sqlSimple + " where c.merchant_id = ? " + order_by;
         List<CategoryDto> categories = jdbcTemplate.query(
                 sqlFindByOwnerId,
-                categoryRowMapper(),
+                categorySimpleRowMapper(),
                 merchantId
         );
         return categories;
@@ -125,11 +130,21 @@ public class CategoryRepository {
         };
     }
 
+    private RowMapper<CategoryDto> categorySimpleRowMapper() {
+        return (rs, rowNum) -> {
+            CategoryDto c = new CategoryDto();
+            c.setId(rs.getLong("id"));
+            c.setName(rs.getString("name"));
+            c.setDescription(rs.getString("description"));
+            c.setStatus(rs.getString("status"));
+            return c;
+        };
+    }
     public CategoryDto findById(Long id) {
-        String sqlFindById = sql + " where c.id = ? ";
+        String sqlFindById = sqlSimple + " where c.id = ? ";
         CategoryDto categoryDto = jdbcTemplate.queryForObject(
                 sqlFindById,
-                categoryRowMapper(),
+                categorySimpleRowMapper(),
                 id
         );
         return categoryDto;

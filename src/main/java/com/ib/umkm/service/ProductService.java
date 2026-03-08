@@ -23,6 +23,9 @@ public class ProductService {
         return productRepository.findByOwnerId(userId);
     }
 
+    public List<ProductDto> getProductsByMerchantId(Long merchantId) {
+        return productRepository.findByMerchantId(merchantId);
+    }
     public PageResult<ProductDto> findPaged(int page, int size, String keyword) {
         int offset = page * size;
 
