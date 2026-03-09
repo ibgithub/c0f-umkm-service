@@ -1,14 +1,14 @@
 package com.ib.umkm.controller.pos;
 
+import com.ib.umkm.dto.pos.Sales;
 import com.ib.umkm.dto.pos.SalesCreateRequest;
 import com.ib.umkm.security.JwtUser;
 import com.ib.umkm.service.pos.SalesService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sales")
@@ -28,9 +28,20 @@ public class SalesController {
                 .getAuthentication()
                 .getPrincipal();
 
-        salesService.createSales(req, user.getUserId(), user.getUsername());
+        Long salesId = salesService.createSales(
+                req,
+                user.getUserId(),
+                user.getUsername()
+        );
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(
+                Map.of("id", salesId)
+        );
+    }
+
+    @GetMapping("/{id}")
+    public Sales getById(@PathVariable Long id) {
+        return salesService.getById(id);
     }
 
 }

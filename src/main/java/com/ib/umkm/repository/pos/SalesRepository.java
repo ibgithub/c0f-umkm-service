@@ -1,12 +1,15 @@
 package com.ib.umkm.repository.pos;
 
 import com.ib.umkm.dto.pos.Sales;
+import com.ib.umkm.dto.pos.SalesItem;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.util.List;
 
 @Repository
 public class SalesRepository {
@@ -56,5 +59,66 @@ public class SalesRepository {
         return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
     }
 
+    public Sales findById(Long id) {
+        String sqlFindById = "select s.id, s.merchant_id, s.outlet_id, s.cashier_id, s.receipt_no, " +
+                "s.total_amount, s.payment_method, s.status, s.subtotal, s.discount_amount, " +
+                "s.tax_amount, s.payment_status, s.created_at, m.name merchant_name " +
+                "FROM umkm.sales s " +
+                "inner join umkm.merchant m on m.id = s.merchant_id " +
+                "where s.id = ? ";
+        Sales sales = jdbcTemplate.queryForObject(
+                sqlFindById,
+                salesRowMapper(),
+                id
+        );
+        return sales;
+    }
 
+    public List<SalesItem> findItemsBySalesId(Long salesId) {
+
+        String sql = "SELECT si.id, si.sales_id, si.product_id, si.product_name, si.qty, " +
+                "si.price, si.subtotal " +
+        " FROM umkm.sales_item si WHERE sales_id = ? ";
+
+        return jdbcTemplate.query(
+                sql,
+                salesItemRowMapper(),
+                salesId
+        );
+    }
+
+    private RowMapper<Sales> salesRowMapper() {
+        return (rs, rowNum) -> {
+            Sales sales = new Sales();
+            sales.setId(rs.getLong("id"));
+            sales.setMerchantId(rs.getLong("merchant_id"));
+            sales.setMerchantName(rs.getString("merchant_name"));
+            sales.setOutletId(rs.getLong("outlet_id"));
+            sales.setCashierId(rs.getLong("cashier_id"));
+            sales.setReceiptNo(rs.getString("receipt_no"));
+            sales.setTotalAmount(rs.getBigDecimal("total_amount"));
+            sales.setPaymentMethod(rs.getString("payment_method"));
+            sales.setStatus(rs.getString("status"));
+            sales.setSubtotal(rs.getBigDecimal("subtotal"));
+            sales.setDiscountAmount(rs.getBigDecimal("discount_amount"));
+            sales.setTaxAmount(rs.getBigDecimal("tax_amount"));
+            sales.setPaymentStatus(rs.getString("payment_status"));
+            sales.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+            return sales;
+        };
+    }
+
+    private RowMapper<SalesItem> salesItemRowMapper() {
+        return (rs, rowNum) -> {
+            SalesItem salesItem = new SalesItem();
+            salesItem.setId(rs.getLong("id"));
+            salesItem.setSalesId(rs.getLong("sales_id"));
+            salesItem.setProductId(rs.getLong("product_id"));
+            salesItem.setProductName(rs.getString("product_name"));
+            salesItem.setQty(rs.getInt("qty"));
+            salesItem.setPrice(rs.getBigDecimal("price"));
+            salesItem.setSubtotal(rs.getBigDecimal("subtotal"));
+            return salesItem;
+        };
+    }
 }

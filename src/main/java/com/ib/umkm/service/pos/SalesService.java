@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 public class SalesService {
@@ -24,7 +25,7 @@ public class SalesService {
     }
 
     @Transactional
-    public void createSales(
+    public Long createSales(
             SalesCreateRequest req,
             Long cashierId,
             String username
@@ -85,7 +86,7 @@ public class SalesService {
         payment.setAmount(total);
 
         salesPaymentRepository.save(payment);
-
+        return salesId;
     }
 
     private String generateReceipt(Long merchantId){
@@ -97,5 +98,11 @@ public class SalesService {
 
         return "INV-" + date + "-" + String.format("%05d", count + 1);
 
+    }
+    public Sales getById(Long id) {
+        Sales sales = salesRepository.findById(id);
+        List<SalesItem> items = salesRepository.findItemsBySalesId(sales.getId());
+        sales.setItems(items);
+        return sales;
     }
 }

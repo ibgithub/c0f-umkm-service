@@ -2,10 +2,12 @@ package com.ib.umkm.dto.pos;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Sales {
     Long id;
     Long merchantId;
+    String merchantName;
     Long outletId;
     Long cashierId;
     String receiptNo;
@@ -16,6 +18,8 @@ public class Sales {
     BigDecimal discountAmount;
     BigDecimal taxAmount;
     String paymentStatus;
+
+    private List<SalesItem> items;
 
     String createdBy;
     LocalDateTime createdAt;
@@ -36,6 +40,14 @@ public class Sales {
 
     public void setMerchantId(Long merchantId) {
         this.merchantId = merchantId;
+    }
+
+    public String getMerchantName() {
+        return merchantName;
+    }
+
+    public void setMerchantName(String merchantName) {
+        this.merchantName = merchantName;
     }
 
     public Long getOutletId() {
@@ -116,6 +128,14 @@ public class Sales {
 
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public List<SalesItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<SalesItem> items) {
+        this.items = items;
     }
 
     public String getCreatedBy() {
