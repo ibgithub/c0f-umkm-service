@@ -151,7 +151,6 @@ public class OutletRepository {
         };
     }
     public OutletDto findById(Long id) {
-//        String sqlFindById = sql + " where o.id = ? ";
         String sqlFindById = "select m.id merchant_id, o.id, o.name, o.address, o.status from umkm.outlet o " +
                 "inner join umkm.merchant m on m.id = o.merchant_id " +
                 "where o.id = ? ";
