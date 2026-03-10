@@ -131,6 +131,17 @@ public class OutletRepository {
             return dto;
         };
     }
+    private RowMapper<OutletDto> outletSimpleRowMapper() {
+        return (rs, rowNum) -> {
+            OutletDto dto = new OutletDto();
+            dto.setId(rs.getLong("id"));
+            dto.setName(rs.getString("name"));
+            dto.setMerchantId(rs.getLong("merchant_id"));
+            dto.setAddress(rs.getString("address"));
+            dto.setStatus(rs.getString("status"));
+            return dto;
+        };
+    }
     private RowMapper<OutletDto> outletLabelRowMapper() {
         return (rs, rowNum) -> {
             OutletDto dto = new OutletDto();
@@ -140,10 +151,13 @@ public class OutletRepository {
         };
     }
     public OutletDto findById(Long id) {
-        String sqlFindById = sql + " where o.id = ? ";
+//        String sqlFindById = sql + " where o.id = ? ";
+        String sqlFindById = "select m.id merchant_id, o.id, o.name, o.address, o.status from umkm.outlet o " +
+                "inner join umkm.merchant m on m.id = o.merchant_id " +
+                "where o.id = ? ";
         OutletDto outletDto = jdbcTemplate.queryForObject(
                 sqlFindById,
-                outletRowMapper(),
+                outletSimpleRowMapper(),
                 id
         );
         return outletDto;

@@ -58,6 +58,7 @@ public class MerchantRepository {
                 merchantRowMapper,
                 limit, offset);
     }
+
     public List<MerchantDto> findByOwnerId(int limit, int offset, Long userId, String keyword) {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
