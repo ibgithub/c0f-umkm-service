@@ -50,7 +50,7 @@ public class SalesController {
         return salesService.getById(id);
     }
 
-    @GetMapping("/report-summary")
+    @GetMapping("/reports_sales")
     public ResponseEntity<ApiResponse<PageResult<SalesReportSummaryDto>>> merchants(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public class SalesReportDto {
     private Long id;
+    private String cashierName;
     private String receiptNo;
     private LocalDateTime createdAt;
     private BigDecimal totalAmount;
@@ -16,6 +17,14 @@ public class SalesReportDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCashierName() {
+        return cashierName;
+    }
+
+    public void setCashierName(String cashierName) {
+        this.cashierName = cashierName;
     }
 
     public String getReceiptNo() {

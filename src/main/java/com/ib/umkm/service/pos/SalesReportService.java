@@ -23,7 +23,7 @@ public class SalesReportService {
 
     public PageResult<SalesReportSummaryDto> findPagedSummary(int page, int size, String keyword) {
         int offset = page * size;
-        List<SalesReportSummaryDto> salesReports = salesReportRepository.findAllGroupByPerDate(size, offset, keyword);
+        List<SalesReportSummaryDto> salesReports = salesReportRepository.findAllGroupByDate(size, offset, keyword);
         int total = salesReportRepository.countAllPerDate(keyword);
 
         return new PageResult<>(salesReports, page, size, total);
@@ -31,8 +31,8 @@ public class SalesReportService {
 
     public PageResult<SalesReportSummaryDto> findPagedSummaryByUserId(int page, int size, Long userId, String keyword) {
         int offset = page * size;
-        List<SalesReportSummaryDto> salesReports = salesReportRepository.findAllGroupByPerDate(size, offset, keyword);
-        int total = salesReportRepository.countAllPerDate(keyword);
+        List<SalesReportSummaryDto> salesReports = salesReportRepository.findAllGroupByDate(size, offset, keyword);
+        int total = salesReportRepository.countAllByDate(keyword);
 
         return new PageResult<>(salesReports, page, size, total);
     }
