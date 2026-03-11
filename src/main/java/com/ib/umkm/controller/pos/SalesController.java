@@ -4,6 +4,7 @@ import com.ib.umkm.common.ApiResponse;
 import com.ib.umkm.common.PageResult;
 import com.ib.umkm.dto.pos.Sales;
 import com.ib.umkm.dto.pos.SalesCreateRequest;
+import com.ib.umkm.dto.pos.SalesReportDto;
 import com.ib.umkm.dto.pos.SalesReportSummaryDto;
 import com.ib.umkm.security.JwtUser;
 import com.ib.umkm.service.pos.SalesReportService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -80,53 +82,26 @@ public class SalesController {
         return ResponseEntity.ok(response);
     }
 
-//    @GetMapping("/report")
-//    public List<SalesReportDto> report(@RequestParam(required = false) Long merchantId,
-//                                       @RequestParam LocalDate fromDate,
-//                                       @RequestParam LocalDate toDate) {
-//        if(fromDate == null){
-//            fromDate = LocalDate.now();
-//        }
-//
-//        if(toDate == null ){
-//            toDate = LocalDate.now().plusDays(1);
-//        }
-//        return salesReportService.findSalesReport(merchantId,
-//                fromDate,
-//                toDate);
-//    }
+    @GetMapping("/reports_sales_detail/{outletId}/{salesDate}")
+    public ResponseEntity<ApiResponse<PageResult<SalesReportDto>>> reportSalesDetail(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String keyword,
+        @PathVariable Long outletId,
+        @PathVariable LocalDate salesDate) {
 
-//    @GetMapping("/report")
-//    public ResponseEntity<ApiResponse<PageResult<SalesReportDto>>> merchants(
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size,
-//        @RequestParam(required = false) String keyword,
-//        @RequestParam(required = false) Long merchantId,
-//        @RequestParam LocalDate fromDate,
-//        @RequestParam LocalDate toDate) {
-//
-//        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-//                .getContext()
-//                .getAuthentication()
-//                .getPrincipal();
-//
-//        PageResult<MerchantDto> result;
-//
-//        if (jwtUser.getRole().contains("ADMIN")) {
-////            result = salesReportService.findPaged(page, size, keyword, fromDate, toDate, merchantId);
-//        } else {
-////            result = salesReportService.findPagedByOwnerId(page, size, jwtUser.getUserId(), keyword);
-//        }
-//
-//        ApiResponse<PageResult<MerchantDto>> response =
-//                new ApiResponse<>(
-//                        true,
-//                        "SUCCESS",
-//                        "Merchants fetched successfully",
-//                        result
-//                );
-//
-//        return ResponseEntity.ok(response);
-//    }
+        PageResult<SalesReportDto> result;
+        result = salesReportService.findPagedByOutletIdDate(page, size, keyword, outletId, salesDate);
+
+        ApiResponse<PageResult<SalesReportDto>> response =
+                new ApiResponse<>(
+                        true,
+                        "SUCCESS",
+                        "Sales report details fetched successfully",
+                        result
+                );
+
+        return ResponseEntity.ok(response);
+    }
 
 }

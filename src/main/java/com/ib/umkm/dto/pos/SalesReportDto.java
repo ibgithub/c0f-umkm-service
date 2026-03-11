@@ -10,6 +10,8 @@ public class SalesReportDto {
     private LocalDateTime createdAt;
     private BigDecimal totalAmount;
     private String paymentMethod;
+    private String paymentStatus;
+    private String status;
 
     public Long getId() {
         return id;
@@ -57,5 +59,21 @@ public class SalesReportDto {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
