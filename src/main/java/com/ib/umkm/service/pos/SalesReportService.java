@@ -24,15 +24,15 @@ public class SalesReportService {
     public PageResult<SalesReportSummaryDto> findPagedSummary(int page, int size, String keyword) {
         int offset = page * size;
         List<SalesReportSummaryDto> salesReports = salesReportRepository.findAllGroupByDate(size, offset, keyword);
-        int total = salesReportRepository.countAllPerDate(keyword);
+        int total = salesReportRepository.countAllByDate(keyword);
 
         return new PageResult<>(salesReports, page, size, total);
     }
 
     public PageResult<SalesReportSummaryDto> findPagedSummaryByUserId(int page, int size, Long userId, String keyword) {
         int offset = page * size;
-        List<SalesReportSummaryDto> salesReports = salesReportRepository.findAllGroupByDate(size, offset, keyword);
-        int total = salesReportRepository.countAllByDate(keyword);
+        List<SalesReportSummaryDto> salesReports = salesReportRepository.findAllGroupByDateByUserId(size, offset, keyword, userId);
+        int total = salesReportRepository.countAllByDateUserId(keyword, userId);
 
         return new PageResult<>(salesReports, page, size, total);
     }

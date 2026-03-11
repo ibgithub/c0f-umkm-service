@@ -16,7 +16,8 @@ public class OutletRepository {
             "from umkm.outlet o " +
             "inner join umkm.merchant m on m.id = o.merchant_id " +
             "inner join umkm.user_merchant um on um.merchant_id = m.id " +
-            "inner join auth.users u on um.user_id = u.id "
+            "inner join auth.users u on um.user_id = u.id " +
+            "WHERE um.business_role = 'OWNER' "
             ;
     String sqlCount = "SELECT COUNT(1) " +
             "from umkm.outlet o " +
@@ -34,7 +35,7 @@ public class OutletRepository {
         return jdbcTemplate.query(sql, outletRowMapper());
     }
     public List<OutletDto> findByOwnerId(Long userId) {
-        String sqlFindByOwnerId = sql + " where um.user_id = ? " + order_by;
+        String sqlFindByOwnerId = sql + " and um.user_id = ? " + order_by;
         List<OutletDto> outlets = jdbcTemplate.query(
                 sqlFindByOwnerId,
                 outletRowMapper(),
@@ -58,7 +59,7 @@ public class OutletRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where upper(m.name) like CONCAT('%', ?, '%') or upper(o.name) like CONCAT('%', ?, '%') or upper(o.address) like CONCAT('%', ?, '%') " +
+            sqlSelect += " and (upper(m.name) like CONCAT('%', ?, '%') or upper(o.name) like CONCAT('%', ?, '%') or upper(o.address) like CONCAT('%', ?, '%') ) " +
                     order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
@@ -87,7 +88,7 @@ public class OutletRepository {
                     userId,
                     limit, offset );
         }
-        String sqlFindByOwnerId = sql + " where um.user_id = ? " + order_by + " LIMIT ? OFFSET ? " ;
+        String sqlFindByOwnerId = sql + " and um.user_id = ? " + order_by + " LIMIT ? OFFSET ? " ;
         return jdbcTemplate.query(sqlFindByOwnerId,
                 new BeanPropertyRowMapper<>(OutletDto.class),
                 userId,
