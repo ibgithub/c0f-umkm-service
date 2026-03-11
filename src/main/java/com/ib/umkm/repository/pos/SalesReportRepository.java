@@ -13,8 +13,9 @@ public class SalesReportRepository {
     private final JdbcTemplate jdbcTemplate;
 
     private String sql = "SELECT s.id, s.receipt_no, s.created_at, s.total_amount, s.payment_method, " +
-            "s.payment_status, s.status " +
+            "s.payment_status, s.status, u.first_name, u.last_name " +
             "FROM umkm.sales s " +
+            "inner join auth.users u on u.id = s.cashier_id " +
             "WHERE s.outlet_id = ? AND date(s.created_at) = ? ";
 
     private String sqlCount = "SELECT count(1) " +
@@ -68,6 +69,12 @@ public class SalesReportRepository {
             salesReport.setPaymentStatus(rs.getString("payment_status"));
             salesReport.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
             salesReport.setStatus(rs.getString("status"));
+            String firstName =  rs.getString("first_name");
+            String lastName = rs.getString("last_name");
+            firstName = (firstName == null ? "" : firstName);
+            lastName = (lastName == null ? "" : lastName);
+            String fullName = firstName + (lastName.isEmpty() ? "" : " " + lastName);
+            salesReport.setCashierName(fullName);
             return salesReport;
         };
     }

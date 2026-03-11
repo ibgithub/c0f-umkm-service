@@ -46,6 +46,7 @@ public class MerchantService {
     public MerchantDto getById(Long id) {
         return merchantRepository.findById(id);
     }
+
     public void createMerchant(MerchantDto request, String loginUser) {
         request.setCreatedBy(loginUser);
         merchantRepository.insert(request);

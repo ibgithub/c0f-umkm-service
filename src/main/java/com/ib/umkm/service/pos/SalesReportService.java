@@ -1,8 +1,10 @@
 package com.ib.umkm.service.pos;
 
 import com.ib.umkm.common.PageResult;
+import com.ib.umkm.dto.pos.SalesItem;
 import com.ib.umkm.dto.pos.SalesReportDto;
 import com.ib.umkm.dto.pos.SalesReportSummaryDto;
+import com.ib.umkm.repository.pos.SalesReportItemRepository;
 import com.ib.umkm.repository.pos.SalesReportRepository;
 import com.ib.umkm.repository.pos.SalesReportSummaryRepository;
 import org.springframework.stereotype.Service;
@@ -14,11 +16,15 @@ import java.util.List;
 public class SalesReportService {
     private final SalesReportSummaryRepository salesReportSummaryRepository;
     private final SalesReportRepository salesReportRepository;
+    private final SalesReportItemRepository salesReportItemRepository;
 
     public SalesReportService(SalesReportSummaryRepository salesReportSummaryRepository,
-                              SalesReportRepository salesReportRepository) {
+                              SalesReportRepository salesReportRepository,
+                              SalesReportItemRepository salesReportItemRepository
+    ) {
         this.salesReportSummaryRepository = salesReportSummaryRepository;
         this.salesReportRepository = salesReportRepository;
+        this.salesReportItemRepository = salesReportItemRepository;
     }
 
     public PageResult<SalesReportSummaryDto> findPagedSummary(int page, int size, String keyword) {
@@ -40,6 +46,14 @@ public class SalesReportService {
         List<SalesReportDto> salesReports = salesReportRepository.findAll(size, offset, keyword, outletId, salesDate);
         int total = salesReportRepository.countAll(keyword, outletId, salesDate);
         return new PageResult<>(salesReports, page, size, total);
+    }
+
+    public List<SalesItem> getItemsBySalesId(Long salesId) {
+        return salesReportItemRepository.getItemBySalesId(salesId);
+    }
+
+    public SalesReportDto getSalesById(Long id) {
+        return salesReportItemRepository.getSalesById(id);
     }
 
 }

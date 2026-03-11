@@ -2,10 +2,7 @@ package com.ib.umkm.controller.pos;
 
 import com.ib.umkm.common.ApiResponse;
 import com.ib.umkm.common.PageResult;
-import com.ib.umkm.dto.pos.Sales;
-import com.ib.umkm.dto.pos.SalesCreateRequest;
-import com.ib.umkm.dto.pos.SalesReportDto;
-import com.ib.umkm.dto.pos.SalesReportSummaryDto;
+import com.ib.umkm.dto.pos.*;
 import com.ib.umkm.security.JwtUser;
 import com.ib.umkm.service.pos.SalesReportService;
 import com.ib.umkm.service.pos.SalesService;
@@ -14,12 +11,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sales")
 public class SalesController {
-
     private final SalesService salesService;
     private final SalesReportService salesReportService;
 
@@ -102,6 +99,14 @@ public class SalesController {
                 );
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/reports_sales_detail_item/{salesId}")
+    public SalesReportDto reportSalesDetailItem(@PathVariable Long salesId) {
+        SalesReportDto  salesReportDto = salesReportService.getSalesById(salesId);
+        List<SalesItem> items = salesReportService.getItemsBySalesId(salesId);
+        salesReportDto.setItems(items);
+        return salesReportDto;
     }
 
 }
