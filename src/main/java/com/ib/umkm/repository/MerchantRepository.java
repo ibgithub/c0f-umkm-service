@@ -122,7 +122,7 @@ public class MerchantRepository {
     };
 
     public MerchantDto findById(Long id) {
-        String sqlFindById = sql + " where m.id = ? ";
+        String sqlFindById = sql + " where m.id = ? and um.business_role = 'OWNER' ";
         MerchantDto merchantDto = jdbcTemplate.queryForObject(
                 sqlFindById,
                 merchantRowMapper,
