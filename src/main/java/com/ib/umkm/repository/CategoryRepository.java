@@ -49,9 +49,9 @@ public class CategoryRepository {
     }
 
     public List<CategoryDto> findByMerchantId(Long merchantId) {
-        String sqlFindByOwnerId = sqlSimple + " where c.merchant_id = ? " + order_by;
+        String sqlFindByMerchantId = sqlSimple + " where c.merchant_id = ? " + order_by;
         List<CategoryDto> categories = jdbcTemplate.query(
-                sqlFindByOwnerId,
+                sqlFindByMerchantId,
                 categorySimpleRowMapper(),
                 merchantId
         );
@@ -133,6 +133,8 @@ public class CategoryRepository {
     private RowMapper<CategoryDto> categorySimpleRowMapper() {
         return (rs, rowNum) -> {
             CategoryDto c = new CategoryDto();
+            c.setMerchantId(rs.getLong("merchant_id"));
+            c.setMerchantName(rs.getString("merchant_name"));
             c.setId(rs.getLong("id"));
             c.setName(rs.getString("name"));
             c.setDescription(rs.getString("description"));

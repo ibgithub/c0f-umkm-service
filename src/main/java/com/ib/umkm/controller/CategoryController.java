@@ -83,7 +83,8 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public CategoryDto getById(@PathVariable Long id) {
-        return categoryService.getById(id);
+        CategoryDto category = categoryService.getById(id);
+        return category;
     }
 
     @PutMapping("/{id}")

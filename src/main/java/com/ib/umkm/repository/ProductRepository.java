@@ -20,9 +20,11 @@ public class ProductRepository {
             "inner join umkm.category c on p.category_id = c.id " +
             "inner join auth.users u on um.user_id = u.id "
             ;
-    String sqlSimple = "select p.id, p.merchant_id, p.name, p.cost_price, " +
-            "p.selling_price, p.status, p.category_id " +
-            "from umkm.product p "
+    String sqlSimple = "select p.id, p.merchant_id, p.name, p.cost_price, p.selling_price, " +
+            "p.status, p.category_id, m.name merchant_name, c.name category_name " +
+            "from umkm.product p " +
+            "inner join umkm.merchant m on p.merchant_id = m.id " +
+            "inner join umkm.category c on p.category_id = c.id "
             ;
     String sqlCount = "SELECT COUNT(1) " +
             "from umkm.product p " +
@@ -125,14 +127,16 @@ public class ProductRepository {
 
     private RowMapper<ProductDto> productSimpleRowMapper() {
         return (rs, rowNum) -> {
-            ProductDto m = new ProductDto();
-            m.setId(rs.getLong("id"));
-            m.setName(rs.getString("name"));
-            m.setCostPrice(rs.getBigDecimal("cost_price"));
-            m.setSellingPrice(rs.getBigDecimal("selling_price"));
-            m.setMerchantId(rs.getLong("merchant_id"));
-            m.setCategoryId(rs.getLong("category_id"));
-            return m;
+            ProductDto product = new ProductDto();
+            product.setId(rs.getLong("id"));
+            product.setName(rs.getString("name"));
+            product.setCostPrice(rs.getBigDecimal("cost_price"));
+            product.setSellingPrice(rs.getBigDecimal("selling_price"));
+            product.setMerchantId(rs.getLong("merchant_id"));
+            product.setCategoryId(rs.getLong("category_id"));
+            product.setMerchantName(rs.getString("merchant_name"));
+            product.setCategoryName(rs.getString("category_name"));
+            return product;
         };
     }
 
